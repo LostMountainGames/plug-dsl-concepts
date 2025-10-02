@@ -1,0 +1,33 @@
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build and Cache
+node_modules/
+dist/
+build/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Test Coverage
+coverage/
+
+# Documentation Build
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# Temporary Files
+*.tmp
+*.temp
