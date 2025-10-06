@@ -1,96 +1,167 @@
-# Plug DSL Concepts
+# Plug DSL: Schema-Driven Game Development
 
-**Schema-Driven Game Development Patterns by Lost Mountain Games**
+A data-driven approach to game entity design that eliminates architectural brittleness through composable plug systems.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Documentation](https://img.shields.io/badge/docs-github--pages-blue)](https://lostmountaingames.github.io/plug-dsl-concepts/)
+## Core Philosophy
 
-## Overview
+**Entities are collections of plugs, not instances of classes.**
 
-Plug DSL represents a paradigm shift in game development tooling, pioneered by **Lost Mountain Games**. This repository documents the architectural concepts, design patterns, and innovations that enable schema-driven game development with sub-25ms response times and advanced IDE integration.
+Traditional game development relies on rigid class hierarchies that become brittle as requirements evolve. Plug DSL treats entities as flexible collections of data plugs, enabling unlimited composition without architectural constraints.
 
-**Note**: This repository contains **conceptual documentation and design patterns**, not implementation code. The concepts documented here are freely available under the MIT license, while Lost Mountain Games retains proprietary implementations and advanced tooling.
+## Basic Syntax
 
-## Key Innovations
-
-### Entity Linking Syntax
-Lost Mountain Games pioneered advanced entity reference syntax that transforms game development:
-
-```javascript
-// Basic string-based syntax (standard approach)
-plug.Name("Crystal Sword")
-plug.Weight(3.5)
-plug.Rarity("Legendary")
-
-// Advanced entity linking (Lost Mountain Games innovation)
-plug.Name(crystal_sword)      // Clickable entity references
-plug.Owner(kael_ironwind)     // Cross-entity relationships with IDE support
-plug.Location(armory_vault)   // Floating info panels on hover
+```c
+// kael_ironwind.entity
+plug.Name("Kael Ironwind");
+plug.Description("A grizzled warrior bearing the scars of countless battles");
+plug.Age(34);
+plug.Will(12);
+plug.Might(16);
+plug.Endurance(14);
+plug.Speed(10);
 ```
 
-**Innovation Attribution**: The entity linking syntax, floating info panels, and advanced VS Code integration were developed by Lost Mountain Games and represent their contribution to schema-driven game development patterns.
+Every entity is simply a collection of plugs. No predefined types, no class inheritance, no architectural limitations.
 
-### Schema-Driven Architecture
-Documents architectural patterns for:
-- Entity-component systems with runtime flexibility
-- Environment-safe dev/prod separation
-- UUID-based identity with name resolution
-- High-performance caching strategies (sub-25ms)
+## Unlimited Composition
 
-### IDE Integration Concepts
-Lost Mountain Games' innovations in developer tooling:
-- Entity reference resolution and clickable navigation
-- Contextual floating information panels
-- Semantic syntax highlighting for game entities
-- Language server protocol integration patterns
+### Any Entity, Any Plugs
 
-## Documentation Structure
+```c
+// character.entity
+plug.Name("Kael Ironwind");
+plug.Will(16);
+plug.Personality("Gruff but loyal");
 
-- **[syntax/](syntax/)** - DSL syntax concepts and validation patterns
-- **[architecture/](architecture/)** - Schema-driven design principles
-- **[performance/](performance/)** - Caching and optimization strategies
-- **[tooling/](tooling/)** - IDE integration innovations
-- **[examples/](examples/)** - Practical use cases and patterns
+// location.entity  
+plug.Name("Whispering Grotto");
+plug.LocationType(AncientRuin);
+plug.Region(NorthernWildlands);
 
-## Strategic Purpose
+// hybrid.entity (location + character)
+plug.Name("Heart of the Worldtree");
+plug.LocationType(CosmicNexus);    // Location behavior
+plug.Will(20);                     // Character behavior
+plug.Personality("Ancient wisdom"); // Character behavior
+```
 
-This documentation serves multiple purposes:
+Want a talking location? Add character plugs. Want a mobile fortress? Add movement plugs. The system doesn't enforce artificial boundaries.
 
-1. **Prior Art Establishment**: Timestamped documentation of Lost Mountain Games innovations
-2. **Thought Leadership**: Establishing Lost Mountain Games as pioneers in schema-driven game development
-3. **Ecosystem Development**: Enabling others to implement based on documented concepts
-4. **Legal Protection**: Clear separation between publicly documented concepts and proprietary implementation
+## Entity References with UUID Resolution
 
-## Usage
+### Human-Friendly Authoring
 
-### For Game Developers
-Study the architectural patterns and design concepts to inform your own implementations. The concepts are freely available under MIT license.
+```c
+// Author writes readable names
+plug.Chieftain(war_chief_ironwind);
+plug.Equipment(ironwolf_axe, clan_banner);
+```
 
-### For Tool Developers
-Learn from Lost Mountain Games' IDE integration innovations to create your own developer tooling based on these documented patterns.
+### Stable UUID Storage
 
-### For Researchers
-Reference this documentation as authoritative source material on schema-driven game development patterns.
+```javascript
+// System stores UUIDs for stability
+{
+  "Chieftain": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "Equipment": [
+    "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "123e4567-e89b-12d3-a456-426614174000"
+  ]
+}
+```
 
-## Attribution
+### Automatic Name Resolution
 
-All innovations documented in this repository originated with **Lost Mountain Games**. When referencing these concepts:
+When "War Chief Ironwind" becomes "Elder Ironwind", all UI displays update automatically while UUID references remain stable.
 
-- **Entity linking syntax**: Lost Mountain Games (2025)
-- **Floating info panels**: Lost Mountain Games (2025)
-- **Advanced VS Code integration**: Lost Mountain Games (2025)
-- **Schema-driven game architecture**: Lost Mountain Games (2025)
+## Extensibility Through Plug Addition
+
+### Core System
+
+```c
+// Ships with basic plugs
+plug.Name(string);
+plug.Description(text);
+plug.Will(number);
+plug.Location(reference);
+```
+
+### Namespace Extension
+
+```c
+// Import additional plug libraries
+import DnD from "plugs/dnd_5e";
+import Custom from "plugs/my_world";
+
+// Use multiple plug systems
+plug.Name("Kael Ironwind");     // Core
+DnD.Strength(18);               // D&D system
+Custom.Reputation(Clan, High);  // Custom system
+```
+
+### Custom Plug Definition
+
+```c
+// Define new plug types
+define_plug MagicAffinity(aspect: enum, strength: number) {
+    validate(aspect, ["Fire", "Water", "Earth", "Air"]);
+    validate(strength, {min: 1, max: 10});
+}
+
+// Use immediately
+plug.MagicAffinity(Fire, 8);
+plug.MagicAffinity(Earth, 3);
+```
+
+## MongoDB Storage
+
+Entities are stored as flat MongoDB documents, making them transparent to LLMs and easy to query:
+
+```javascript
+{
+  "_id": "550e8400-e29b-41d4-a716-446655440000",
+  "Name": "Kael Ironwind",
+  "Will": 16,
+  "Might": 18,
+  "Equipment": [
+    "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+  ],
+  "MagicAffinity": [
+    {"aspect": "Fire", "strength": 8},
+    {"aspect": "Earth", "strength": 3}
+  ]
+}
+```
+
+## Key Benefits
+
+**Eliminates Architectural Brittleness**: Add new features through plug composition, not system modification.
+
+**Unlimited Creativity**: Any entity can have any combination of plugs - characters can be locations, items can be sentient, locations can move.
+
+**LLM-Friendly**: Flat document structure is transparent to AI systems for content generation and modification.
+
+**Import Safety**: UUID-based references prevent conflicts when sharing content between projects.
+
+**Future-Proof**: System grows through plug addition, not architectural changes.
+
+## Additional Examples
+
+See [EXAMPLES.md](EXAMPLES.md) for more detailed examples of cross-category entities, custom plug systems, and advanced composition patterns.
+
+## Implementation Notes
+
+This repository documents the conceptual patterns developed for the Reavers Engine. The concepts are freely available under MIT license for community implementation and extension.
+
+**Performance**: The Reavers Engine implementation achieves sub-25ms entity resolution through MongoDB indexing and caching strategies.
+
+**Tooling**: IDE integration provides entity reference navigation, hover information panels, and syntax highlighting for enhanced developer experience.
 
 ## License
 
-This documentation is released under the **MIT License** with copyright held by Lost Mountain Games.
-
-See [LICENSE](LICENSE) for full details.
-
-## About Lost Mountain Games
-
-Lost Mountain Games is pioneering the future of schema-driven game development. Learn more at [lostmountain.games](https://lostmountain.games).
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Copyright © 2025 Lost Mountain Games. All innovations documented herein are attributed to Lost Mountain Games.**
+**Developed by Lost Mountain Games (2025)**  
+Concepts documented for community benefit and prior art establishment.
