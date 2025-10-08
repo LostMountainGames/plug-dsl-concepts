@@ -2,6 +2,32 @@
 
 Practical examples demonstrating the flexibility of plug-based entity composition.
 
+## Unlimited Composition Patterns
+
+### Any Entity, Any Plugs
+
+The system doesn't enforce artificial boundaries between entity types:
+
+```c
+// character.entity
+plug.Name("Kael Ironwind");
+plug.Will(16);
+plug.Personality("Gruff but loyal");
+
+// location.entity  
+plug.Name("Whispering Grotto");
+plug.LocationType(AncientRuin);
+plug.Region(NorthernWildlands);
+
+// hybrid.entity (location + character)
+plug.Name("Heart of the Worldtree");
+plug.LocationType(CosmicNexus);    // Location behavior
+plug.Will(20);                     // Character behavior
+plug.Personality("Ancient wisdom"); // Character behavior
+```
+
+Want a talking location? Add character plugs. Want a mobile fortress? Add movement plugs.
+
 ## Cross-Category Entities
 
 ### Sentient Location
